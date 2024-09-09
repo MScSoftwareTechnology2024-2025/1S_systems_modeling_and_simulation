@@ -1,0 +1,13 @@
+{
+  "name": "probability_theory",
+  "version": "1.0.0",
+  "description": "Exercises for Probability theory",
+  "main": "exercises.mjs",
+  "author": "MartinStrekelj",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "exercise": "node exercises.test.mjs"
+  }
+}
