@@ -1,0 +1,5 @@
+The time average size of the queue was: 0.5398308
+The time average utilization of the server was: 0.51091534
+The aveage wait in queue was: 0.52487147
+Wait times were divided by: 1000
+
