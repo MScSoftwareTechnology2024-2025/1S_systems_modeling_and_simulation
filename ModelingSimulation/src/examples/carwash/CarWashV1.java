@@ -1,4 +1,4 @@
-package task;
+package examples.carwash;
 
 import java.util.Vector;
 
