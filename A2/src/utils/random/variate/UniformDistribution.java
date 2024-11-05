@@ -1,4 +1,4 @@
-package generators.random.variate;
+package utils.random.variate;
 
 public class UniformDistribution {
     private double lowerLimit;

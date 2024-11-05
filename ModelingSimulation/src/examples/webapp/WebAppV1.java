@@ -1,13 +1,12 @@
-package examples.carwash;
+package examples.webapp;
 
 import java.util.Vector;
 
 import generators.random.variate.ExponentialDistribution;
-import generators.random.variate.UniformDistribution;
 
-public class CarWashV1 {
-    private final double MEAN_INTERARRIVAL = 1 / 1.25; // hours
-    // private final double NUMBER_OF_DELAYS = 0;
+public class WebAppV1 {
+    private final double MEAN_INTERARRIVAL = 7; // per second
+    private final WebService[] servers = new WebService[2];
 
     /**
      * Needs to be different because we need to do cleanup after each day (8 hours)
@@ -15,7 +14,6 @@ public class CarWashV1 {
     private final int HOURS_PER_DAY = 8;
     private final int TARGET_DAYS = 90;
     private final int TARGET_HOURS = HOURS_PER_DAY * TARGET_DAYS;
-
 
     // Output
     private Vector<Double> time = new Vector<Double>();
@@ -50,14 +48,12 @@ public class CarWashV1 {
     private int iterations;
 
     ExponentialDistribution ed;
-    UniformDistribution ud;
 
-    public CarWashV1() {
+    public WebAppV1() {
         this.ed = new ExponentialDistribution(SEED);
-        double upper = 1 / 0.5;
-        double lower = 1 / 1.5;
-        this.ud = new UniformDistribution(lower, upper);
         this.mean_interarrival = MEAN_INTERARRIVAL;
+        this.servers[0] = new WebService();
+        this.servers[1] = new WebService();
     }
 
     private void timing() {
@@ -66,7 +62,6 @@ public class CarWashV1 {
         next_event_type = -1;
 
         // Determine the event type of the next event to occur
-
         for (i = 0; i < NUM_EVENTS; i++)
             if (this.event_list[i] < min_time_next_event) {
                 min_time_next_event = this.event_list[i];
@@ -79,12 +74,12 @@ public class CarWashV1 {
             // The event list is empty, so stop the simulation.
             System.exit(1);
         }
+
         /* The event list is not empty, so advance the simulation clock. */
         clock = min_time_next_event;
     }
 
     private void update_time_avg_stats() {
-
         double time_since_last_event;
 
         time.add(this.time_last_event);
@@ -113,37 +108,31 @@ public class CarWashV1 {
     // and server status.. so change the carArrive & carDepart methods to fit the
     // usecase.. also change the type/outcome of data we want to collect in
     // simulation
-
-    public void carArrives() {
+    public void requestArrives() {
         this.event_list[0] = this.clock + ed.random(this.mean_interarrival);
 
-        Boolean serverIsBusy = this.server_status == BUSY;
-
-        if (serverIsBusy) {
-            this.num_in_q++;
-
-            if (this.num_in_q > Q_LIMIT) {
-                System.out.println("Overflow of the array time_arrival at time " + this.clock);
-                // The queue is too long
-                System.exit(1);
-            }
-            this.time_arrival[this.num_in_q] = this.clock;
+        if (!this.servers[0].isBusy()) {
+            this.servers[0].handleRequest();
+            this.event_list[1] = this.clock + this.servers[0].getServiceTime();
             return;
         }
 
+        // when server 2 is handling it, increase the queue
+        if (!this.servers[1].isBusy()) {
+            this.servers[1].handleRequest();
+            this.event_list[1] = this.clock + this.servers[1].getServiceTime();
+            return;
+        }
+
+        // What happens if both servers are busy?
+        this.num_in_q++;
         double delay = 0.0;
         this.total_delay += delay;
-
         this.num_delayed++;
         this.server_status = BUSY;
-
-        double service_time = ud.generate();
-
-        this.event_list[1] = this.clock + service_time;
     }
 
-    private void carDeparts() {
-
+    private void requestLeaves() {
         Boolean queueIsEmpty = this.num_in_q == 0;
 
         // Check to see whether the queue is empty.
@@ -156,18 +145,14 @@ public class CarWashV1 {
         }
 
         // The queue is nonempty, so decrement the number of customers in queue.
-        this.num_in_q--;
+        // If the first server is busy, then the request is handled by the first server
+        if (this.servers[0].isProcessing()) {
+            this.servers[0].requestHandled();
+        } else {
+            this.servers[1].requestHandled();
+        }
 
-        // Compute the delay of the customer who is beginning service and update the
-        // total delay accumulator.
-        double delay = this.clock - this.time_arrival[1];
-        this.total_delay += delay;
-
-        // Increment the number of customers delayed, and schedule departure.
-        this.num_delayed++;
-
-        // Schedule a departure event for this customer
-        this.event_list[1] = this.clock + ud.generate();
+        System.out.println("Request left the system at " + this.clock);
 
         // Move each customer in queue (if any) up one place.
         for (int i = 1; i <= this.num_in_q + 1; i++)
@@ -211,10 +196,10 @@ public class CarWashV1 {
             // Invoke the appropriate event function
             switch (this.next_event_type) {
                 case 0:
-                    this.carArrives();
+                    this.requestArrives();
                     break;
                 case 1:
-                    this.carDeparts();
+                    this.requestLeaves();
                     break;
             }
             j++;
@@ -228,7 +213,7 @@ public class CarWashV1 {
         // Write report heading and input parameters
         System.out.println("Single-server queueing system\n");
         System.out.println("Mean interarrival time " + mean_interarrival + " hours\n");
-        System.out.println(ud.toString() + "\n\n");
+        // System.out.println(ud.toString() + "\n\n");
 
         // Compute and write estimates of desired measures of performance
         System.out.println("\n\nAverage delay in queue " + this.total_delay / this.num_delayed + " hours \n");
@@ -242,16 +227,16 @@ public class CarWashV1 {
 
     public static void main(String[] args) {
 
-        CarWashV1 mm1 = new CarWashV1();
+        WebAppV1 webapp = new WebAppV1();
 
         // Initialize the Simulation
-        mm1.initialize();
+        webapp.initialize();
 
         // Execute the simulation
-        mm1.run();
+        webapp.run();
 
         // Invoke the report generator and end the simulation.
-        mm1.report(null);
+        webapp.report(null);
 
         // Plot the results
         // mm1.plot();
