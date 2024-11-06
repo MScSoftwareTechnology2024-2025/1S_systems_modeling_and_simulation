@@ -51,15 +51,15 @@ public class Configuration implements SimulationInterface {
 
         // * run the simulation until the clock reaches the end of the day
         while (systemState.getClock() < DAY) {
-            EventInterface nextEvent = this.getNextEvent();
+            EventInterface nextEvent = this.getNextEvent(); // timing method
             this.updateStatistics();
             this.processEvent(nextEvent);
         }
 
+        // * set the total time of the simulation to statistics
         statistics.setTotalTime(systemState.getClock());
-        // * return statistics of the simulation
-        statistics.printStatistics();
 
+        // * return statistics of the simulation
         return statistics;
     }
 
