@@ -1,4 +1,4 @@
-package utils.simulation;
+package simulations.common;
 
 /**
  * The SystemState class represents the state of a system in a simulation.

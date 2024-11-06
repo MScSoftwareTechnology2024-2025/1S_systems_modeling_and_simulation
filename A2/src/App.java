@@ -1,5 +1,5 @@
 import simulations.Configuration;
-import utils.simulation.SimulationStatistics;
+import simulations.common.SimulationStatistics;
 
 public class App {
 

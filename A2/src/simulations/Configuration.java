@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import simulations.common.RequestBuffer;
+import simulations.common.RequestType;
+import simulations.common.SimulationStatistics;
+import simulations.common.SystemState;
 import simulations.events.RequestArrivalEvent;
 import simulations.events.RequestCompleteEvent;
+import simulations.interfaces.EventInterface;
+import simulations.interfaces.SimulationInterface;
 import utils.random.RandomWeightedChoice;
 import utils.random.variate.ExponentialDistribution;
-import utils.simulation.EventInterface;
-import utils.simulation.RequestBuffer;
-import utils.simulation.RequestType;
-import utils.simulation.SimulationInterface;
-import utils.simulation.SimulationStatistics;
-import utils.simulation.SystemState;
 
 public class Configuration implements SimulationInterface {
 

@@ -1,4 +1,4 @@
-package utils.simulation;
+package simulations.common;
 
 public class RequestType {
     private String name;

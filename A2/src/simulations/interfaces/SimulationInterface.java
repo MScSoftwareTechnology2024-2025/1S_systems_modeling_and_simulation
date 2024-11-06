@@ -1,4 +1,6 @@
-package utils.simulation;
+package simulations.interfaces;
+
+import simulations.common.SimulationStatistics;
 
 public interface SimulationInterface {
     public SimulationStatistics run();

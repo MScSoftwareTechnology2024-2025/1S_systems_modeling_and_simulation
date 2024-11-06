@@ -1,7 +1,7 @@
 package simulations.events;
 
-import utils.simulation.EventInterface;
-import utils.simulation.RequestType;
+import simulations.common.RequestType;
+import simulations.interfaces.EventInterface;
 
 public class RequestArrivalEvent implements EventInterface {
     double arrivalTime;

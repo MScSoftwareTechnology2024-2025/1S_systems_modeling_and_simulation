@@ -1,4 +1,4 @@
-package utils.simulation;
+package simulations.common;
 
 import simulations.events.RequestArrivalEvent;
 import java.util.LinkedList;

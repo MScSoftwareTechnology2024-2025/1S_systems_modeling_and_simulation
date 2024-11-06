@@ -1,8 +1,9 @@
 package utils.random;
 
 import java.util.List;
-import utils.simulation.RequestType;
 import java.util.Random;
+
+import simulations.common.RequestType;
 
 public class RandomWeightedChoice {
     private static final Random random = new Random();

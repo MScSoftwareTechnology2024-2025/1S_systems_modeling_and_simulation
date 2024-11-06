@@ -1,6 +1,6 @@
 package simulations.events;
 
-import utils.simulation.EventInterface;
+import simulations.interfaces.EventInterface;
 
 public class RequestCompleteEvent implements EventInterface {
     double startTime;
