@@ -17,6 +17,7 @@ import utils.simulation.SystemState;
 
 public class Configuration implements SimulationInterface {
 
+    private final int REQUEST_PER_MINUTE = 34;
     private final int DAY = 86400; // 24 hours in seconds
     private final RequestBuffer requestBuffer;
     private double lambda; // interarrival rate
@@ -36,7 +37,7 @@ public class Configuration implements SimulationInterface {
         expDist = new ExponentialDistribution(SEED);
         systemState = new SystemState(SERVERS);
         requestBuffer = new RequestBuffer(BUFFER);
-        this.lambda = this.calcLambdaFromMinutesToSeconds(34);
+        this.lambda = this.calcLambdaFromMinutesToSeconds(REQUEST_PER_MINUTE);
     }
 
     private double calcLambdaFromMinutesToSeconds(double interarrivalTime) {
@@ -49,11 +50,13 @@ public class Configuration implements SimulationInterface {
         this.initialize();
 
         // * run the simulation until the clock reaches the end of the day
-        while (systemState.getClock() < 3 * DAY) {
+        while (systemState.getClock() < DAY) {
             EventInterface nextEvent = this.getNextEvent();
+            this.updateStatistics();
             this.processEvent(nextEvent);
         }
 
+        statistics.setTotalTime(systemState.getClock());
         // * return statistics of the simulation
         statistics.printStatistics();
 
@@ -85,6 +88,7 @@ public class Configuration implements SimulationInterface {
 
         // take the next event from the event list and proceed the clock to its time
         EventInterface nextEvent = eventList.poll();
+        systemState.setLastEventTime();
         systemState.proceedClock(nextEvent.getTime());
         return nextEvent;
     }
@@ -108,6 +112,7 @@ public class Configuration implements SimulationInterface {
         statistics.incrementRequestCount(SimulationStatistics.REQUEST_ARRIVED);
         // assign server to the request
         systemState.assignServer(server);
+
         // schedule complete request event for this request
         scheduleCompleteEvent(event, server);
     }
@@ -144,5 +149,17 @@ public class Configuration implements SimulationInterface {
 
     private boolean isTimeForNextArrival() {
         return systemState.getClock() >= systemState.getNextArrivalTime();
+    }
+
+    private void updateStatistics() {
+        int activeServers = systemState.getNumberOfActiveServers();
+        int numServers = systemState.getNumberOfServers();
+        double time = systemState.getClock() - systemState.getLastEventTime();
+        double serverUtilization = (double) (activeServers / numServers) * time;
+        statistics.addTimeUnderLoad(serverUtilization);
+
+        // requests in system
+        double requestsInSystem = activeServers + requestBuffer.getNumberOfRequestsInBuffer();
+        statistics.addRequestsInSystem(requestsInSystem);
     }
 }

@@ -35,4 +35,8 @@ public class RequestBuffer {
     public boolean isEmpty() {
         return buffer.isEmpty();
     }
+
+    public double getNumberOfRequestsInBuffer() {
+        return buffer.size();
+    }
 }

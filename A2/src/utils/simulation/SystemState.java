@@ -10,6 +10,7 @@ public class SystemState {
     private double clock;
     private boolean[] servers;
     private double nextArrivalTime = 0.0;
+    private double lastEventTime = 0.0;
 
     public SystemState(int numberOfServers) {
         this.clock = 0.0;
@@ -23,6 +24,14 @@ public class SystemState {
         }
     }
 
+    public void setLastEventTime() {
+        this.lastEventTime = clock;
+    }
+
+    public double getLastEventTime() {
+        return lastEventTime;
+    }
+
     public void proceedClock(double time) {
         clock = time;
     }
@@ -31,8 +40,19 @@ public class SystemState {
         return clock;
     }
 
-    public boolean isFirstEvent() {
-        return clock == 0.0;
+    public int getNumberOfActiveServers() {
+        int activeServers = 0;
+        for (boolean server : servers) {
+            if (server) {
+                activeServers++;
+            }
+        }
+
+        return activeServers;
+    }
+
+    public int getNumberOfServers() {
+        return servers.length;
     }
 
     public double getNextArrivalTime() {

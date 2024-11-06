@@ -103,10 +103,9 @@ public class CarWashV1 {
         this.area_under_Qt += this.num_in_q * time_since_last_event;
 
         // Update area under server-busy indicator function
-        // ! for multiple servers here we (this.server_status/num_of_servers) *
+        // ! for multiple servers here we 
         // time_since_last_event
         this.area_under_Bt += this.server_status * time_since_last_event;
-
     }
 
     // for task3 check / manipulate the time of next event based on the current time
