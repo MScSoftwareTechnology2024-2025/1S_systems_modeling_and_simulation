@@ -7,34 +7,20 @@ package utils.simulation;
  * system has been busy, and whether the system is currently busy.
  */
 public class SystemState {
-    private static final int Q_LIMIT = 10_000;
     private double clock;
-    private int numInQ;
-    private int numInS;
-    private double timeLastEvent;
     private boolean[] servers;
     private double nextArrivalTime = 0.0;
 
-    // Statistics
-    private int num_delayed;
-    private double total_delay;
-    private double area_under_Qt;
-    private double area_under_Bt;
-
     public SystemState(int numberOfServers) {
         this.clock = 0.0;
-        this.numInQ = 0;
-        this.numInS = 0;
-        this.timeLastEvent = 0.0;
-
-        this.num_delayed = 0;
-        this.total_delay = 0.0;
-        this.area_under_Qt = 0.0;
-        this.area_under_Bt = 0.0;
-
         this.servers = new boolean[numberOfServers];
-        // this.eventList[0] = clock + timeOfFirstEvent;
-        // this.eventList[1] = Double.MAX_VALUE;
+    }
+
+    public void initialize() {
+        this.clock = 0.0;
+        for (int i = 0; i < servers.length; i++) {
+            servers[i] = false;
+        }
     }
 
     public void proceedClock(double time) {

@@ -1,7 +1,7 @@
 package utils.simulation;
 
 public interface SimulationInterface {
-    public void run();
+    public SimulationStatistics run();
 
     public void initialize();
 
