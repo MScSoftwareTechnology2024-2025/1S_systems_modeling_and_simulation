@@ -6,9 +6,13 @@ import java.util.Random;
 import simulations.common.RequestType;
 
 public class RandomWeightedChoice {
-    private static final Random random = new Random();
+    private Random random;
 
-    public static RequestType chooseRequestType(List<RequestType> choices) {
+    public RandomWeightedChoice(long seed) {
+        random = new Random(seed);
+    }
+
+    public RequestType chooseRequestType(List<RequestType> choices) {
         double totalWeight = choices.stream().mapToDouble(RequestType::getPercentageChance).sum();
         double randomValue = random.nextDouble() * totalWeight;
 
