@@ -74,19 +74,43 @@ class ConfigurationRunner {
                 writer.append(String.format(Locale.US, "%d;%.6f;%.6f;%.6f\n",
                     i + 1, dropRate, utilization, avgResponseTime));
             }
+        // Calculate overall statistics for Drop Rate
+        double meanDropRate = dropRates.stream().mapToDouble(a -> a).average().orElse(0.0);
+        double varianceDropRate = dropRates.stream()
+            .mapToDouble(a -> Math.pow(a - meanDropRate, 2))
+            .sum() / (repetitions - 1);
+        double stdDevDropRate = Math.sqrt(varianceDropRate);
+        double ciHalfWidthDropRate = 1.96 * stdDevDropRate / Math.sqrt(repetitions);
 
-            // Calculate overall statistics
-            double meanDropRate = dropRates.stream().mapToDouble(a -> a).average().orElse(0.0);
-            double variance = dropRates.stream()
-                .mapToDouble(a -> Math.pow(a - meanDropRate, 2))
-                .sum() / (repetitions - 1);
-            double standardDeviation = Math.sqrt(variance);
-            double ciHalfWidth = 1.96 * standardDeviation / Math.sqrt(repetitions);
+        // Calculate overall statistics for Utilization
+        double meanUtilization = utilizations.stream().mapToDouble(a -> a).average().orElse(0.0);
+        double varianceUtilization = utilizations.stream()
+            .mapToDouble(a -> Math.pow(a - meanUtilization, 2))
+            .sum() / (repetitions - 1);
+        double stdDevUtilization = Math.sqrt(varianceUtilization);
+        double ciHalfWidthUtilization = 1.96 * stdDevUtilization / Math.sqrt(repetitions);
 
-            // Output statistics
-            System.out.println("Mean drop rate: " + meanDropRate);
-            System.out.println("Variance: " + variance);
-            System.out.println("95% CI Half-Width: " + ciHalfWidth);
+        // Calculate overall statistics for Average Response Time
+        double meanResponseTime = averageResponseTimes.stream().mapToDouble(a -> a).average().orElse(0.0);
+        double varianceResponseTime = averageResponseTimes.stream()
+            .mapToDouble(a -> Math.pow(a - meanResponseTime, 2))
+            .sum() / (repetitions - 1);
+        double stdDevResponseTime = Math.sqrt(varianceResponseTime);
+        double ciHalfWidthResponseTime = 1.96 * stdDevResponseTime / Math.sqrt(repetitions);
+
+        // Output statistics
+        System.out.println("Mean drop rate: " + meanDropRate);
+        System.out.println("Variance: " + varianceDropRate);
+        System.out.println("95% CI Half-Width: " + ciHalfWidthDropRate);
+
+        // Output additional statistics
+        System.out.println("Mean utilization: " + meanUtilization);
+        System.out.println("Utilization Variance: " + varianceUtilization);
+        System.out.println("Utilization 95% CI Half-Width: " + ciHalfWidthUtilization);
+
+        System.out.println("Mean average response time: " + meanResponseTime);
+        System.out.println("Response Time Variance: " + varianceResponseTime);
+        System.out.println("Response Time 95% CI Half-Width: " + ciHalfWidthResponseTime);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,7 +128,7 @@ class ConfigurationRunner {
 
     private int calculateRepetition(int SERVERS, int BUFFER) {
         int R_0 = 20;
-        double precision = 0.001;
+        double precision = 0.01;
         List<Double> dropRates = new ArrayList<>();
         double Z_value = 1.96;
 
@@ -120,8 +144,10 @@ class ConfigurationRunner {
             .mapToDouble(a -> Math.pow(a - meanDropRate, 2))
             .sum() / (R_0 - 1);
         double standardDeviation = Math.sqrt(variance);
+        double E = precision * meanDropRate;
 
-        int repetitions = (int) Math.ceil(Math.pow((Z_value * standardDeviation) / precision, 2));
+
+        int repetitions = (int) Math.ceil(Math.pow((Z_value * standardDeviation) / E, 2));
 
         // Ensure repetitions are at least R_0
         repetitions = Math.max(repetitions, R_0);
