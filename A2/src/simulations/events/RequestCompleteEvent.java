@@ -15,12 +15,8 @@ public class RequestCompleteEvent implements EventInterface {
         this.server = server;
     }
 
-    public double getResponseTime() {
-        if (completionTime < startTime) {
-            throw new IllegalArgumentException("Completion time is less than start time");
-        }
-
-        return completionTime - startTime;
+    public double getArriveTime() {
+        return startTime;
     }
 
     public int getServer() {

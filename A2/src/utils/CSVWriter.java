@@ -18,9 +18,9 @@ public class CSVWriter {
         }
     }
 
-    public void addRow(int run, double dropRate, double utilization, double averageResponseTime) {
+    public void addRow(String run, double dropRate, double utilization, double averageResponseTime) {
         try {
-            String row = String.format(Locale.US, "%d;%.2f;%.2f;%.2fs", run, dropRate, utilization,
+            String row = String.format(Locale.US, "%s;%.2f;%.2f;%.2fs", run, dropRate, utilization,
                     averageResponseTime);
             writer.append(row + "\n");
         } catch (IOException e) {

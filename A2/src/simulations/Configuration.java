@@ -130,7 +130,8 @@ public class Configuration implements SimulationInterface {
         // free server that was processing the event
         systemState.freeServer(event.getServer());
 
-        statistics.addResponseTime(event.getResponseTime());
+        double responseTime = systemState.getClock() - event.getArriveTime();
+        statistics.addResponseTime(responseTime);
 
         // pops the buffered request from the buffer to process it
         if (!requestBuffer.isEmpty()) {
@@ -151,7 +152,7 @@ public class Configuration implements SimulationInterface {
         double serviceTime = arrivingEvent.getType().getServiceTime();
         double meanServiceTime = expDist.random(serviceTime);
         double departureTime = systemState.getClock() + meanServiceTime;
-        eventList.add(new RequestCompleteEvent(systemState.getClock(), departureTime, server));
+        eventList.add(new RequestCompleteEvent(arrivingEvent.getTime(), departureTime, server));
     }
 
     private boolean isTimeForNextArrival() {

@@ -14,13 +14,22 @@ public class App {
     public static void main(String[] args) throws Exception {
         App.runConfiguration1();
         App.runConfiguration2();
+
+        // Configuration configuration = new Configuration(42, 4, 6);
+        // SimulationStatistics results = configuration.run();
+        // System.out.println("Drop Rate: " + results.getDropRate());
+        // System.out.println("Utilization: " + results.getUtilization());
+        // System.out.println("Average Response Time: " +
+        // results.calculateAverageResponseTime());
     }
 
     private static int calculateRepetition(int SERVERS, int BUFFER) {
-        int R_0 = 20;
-        double precision = 0.005; // 1%
+        System.out.println("________Calculating required repetitions...________\n");
+
+        int R_0 = 10;
+        double precision = 0.05; // 5%
         List<Double> dropRates = new ArrayList<>();
-        double Z_value = 1.96;
+        double Z_value = 1.96; // 95% confidence interval
 
         for (int i = 0; i < R_0; i++) {
             Configuration configuration = new Configuration(INITIAL_SEED + i, SERVERS, BUFFER);
@@ -35,11 +44,14 @@ public class App {
                 .sum() / (R_0 - 1);
         double standardDeviation = Math.sqrt(variance);
 
-        double E = precision * meanDropRate;
         // Calculate the required number of repetitions
-        double n = Math.pow((Z_value * standardDeviation) / E, 2);
-        int requiredRepetitions = (int) Math.ceil(n) - R_0;
+        double n = Math.pow((Z_value * standardDeviation) / precision, 2);
+        int requiredRepetitions = (int) Math.ceil(n);
 
+        System.out.println("R_0: " + R_0);
+        System.out.println("Mean drop rate: " + meanDropRate);
+        System.out.println("Standard Deviation: " + standardDeviation);
+        System.out.println("Precision e: " + precision);
         System.out.println("Required repetitions: " + requiredRepetitions);
         return requiredRepetitions;
     }
@@ -65,11 +77,11 @@ public class App {
             dropRates.add(dropRate);
             utilizations.add(utilization);
             averageResponseTimes.add(avgResponseTime);
-            csvWriter.addRow(i + 1, dropRate, utilization, avgResponseTime);
+            csvWriter.addRow(Integer.toString(i + 1), dropRate, utilization, avgResponseTime);
         }
 
-        csvWriter.close();
         App.outputAnalysis(dropRates, utilizations, averageResponseTimes);
+        csvWriter.close();
 
         System.out.println("\n________Configuration 1 simulation completed!________\n");
     }
@@ -97,13 +109,12 @@ public class App {
             dropRates.add(dropRate);
             utilizations.add(utilization);
             averageResponseTimes.add(avgResponseTime);
-            csvWriter.addRow(i + 1, dropRate, utilization, avgResponseTime);
+            csvWriter.addRow(Integer.toString(i + 1), dropRate, utilization, avgResponseTime);
         }
 
-        csvWriter.close();
         App.outputAnalysis(dropRates, utilizations, averageResponseTimes);
+        csvWriter.close();
         System.out.println("\n________Configuration 2 simulation completed!________\n");
-
     }
 
     private static void outputAnalysis(List<Double> dropRates, List<Double> utilizations,
@@ -133,12 +144,12 @@ public class App {
         double ciHalfWidthResponseTime = 1.96 * stdDevResponseTime / Math.sqrt(averageResponseTimes.size());
 
         System.out.println("\n");
-        System.out.println("Mean drop rate: " + String.format(Locale.US, "%.2f", (meanDropRate * 100)) + "%");
+        System.out.println("Mean drop rate: " + String.format(Locale.US, "%.2f", (meanDropRate)) + "%");
         System.out.println("Variance: " + varianceDropRate);
         System.out.println("95% CI Half-Width: " + ciHalfWidthDropRate);
         System.out.println("\n");
 
-        System.out.println("Mean utilization: " + String.format(Locale.US, "%.2f", (meanUtilization * 100)) + "%");
+        System.out.println("Mean utilization: " + String.format(Locale.US, "%.2f", (meanUtilization)) + "%");
         System.out.println("Utilization Variance: " + varianceUtilization);
         System.out.println("Utilization 95% CI Half-Width: " + ciHalfWidthUtilization);
         System.out.println("\n");
@@ -147,5 +158,6 @@ public class App {
                 "Mean average response time: " + String.format(Locale.US, "%.2f", meanResponseTime) + " s");
         System.out.println("Response Time Variance: " + varianceResponseTime);
         System.out.println("Response Time 95% CI Half-Width: " + ciHalfWidthResponseTime);
+        csvWriter.addRow("Total", meanDropRate, meanUtilization, meanResponseTime);
     }
 }
