@@ -35,4 +35,10 @@ public class RequestCompleteEvent implements EventInterface {
     public static String getEventType() {
         return "RequestCompleteEvent";
     }
+
+    @Override
+    public String toString() {
+        return "RequestCompleteEvent [startTime=" + startTime + ", completionTime=" + completionTime + ", server="
+                + server + "]";
+    }
 }

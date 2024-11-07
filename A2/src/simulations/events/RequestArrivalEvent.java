@@ -26,4 +26,9 @@ public class RequestArrivalEvent implements EventInterface {
     public static String getEventType() {
         return "RequestArrivalEvent";
     }
+
+    @Override
+    public String toString() {
+        return "RequestArrivalEvent [arrivalTime=" + arrivalTime + ", type=" + type.getName() + "]";
+    }
 }
