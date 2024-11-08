@@ -8,19 +8,12 @@ import utils.CSVWriter;
 
 public class App {
 
-    private static CSVWriter csvWriter = new CSVWriter();
     private static int INITIAL_SEED = 1000;
+    private static CSVWriter csvWriter = new CSVWriter();
 
     public static void main(String[] args) throws Exception {
         App.runConfiguration1();
         App.runConfiguration2();
-
-        // Configuration configuration = new Configuration(42, 4, 6);
-        // SimulationStatistics results = configuration.run();
-        // System.out.println("Drop Rate: " + results.getDropRate());
-        // System.out.println("Utilization: " + results.getUtilization());
-        // System.out.println("Average Response Time: " +
-        // results.calculateAverageResponseTime());
     }
 
     private static int calculateRepetition(int SERVERS, int BUFFER) {

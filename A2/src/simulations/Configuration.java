@@ -48,6 +48,11 @@ public class Configuration implements SimulationInterface {
     }
 
     @Override
+    public void initialize() {
+        systemState.initialize();
+    }
+
+    @Override
     public SimulationStatistics run() {
         // * initialize the simulation
         this.initialize();
@@ -66,22 +71,6 @@ public class Configuration implements SimulationInterface {
         return statistics;
     }
 
-    @Override
-    public void initialize() {
-        systemState.initialize();
-    }
-
-    @Override
-    public void processEvent(EventInterface event) {
-        if (event instanceof RequestArrivalEvent) {
-            handleRequestArrivalEvent((RequestArrivalEvent) event);
-        }
-
-        if (event instanceof RequestCompleteEvent) {
-            handleRequestCompleteEvent((RequestCompleteEvent) event);
-        }
-    }
-
     private EventInterface getNextEvent() {
         if (this.isTimeForNextArrival()) {
             scheduleArrivalEvent();
@@ -98,6 +87,21 @@ public class Configuration implements SimulationInterface {
         systemState.setLastEventTime();
         systemState.proceedClock(nextEvent.getTime());
         return nextEvent;
+    }
+
+    private boolean isTimeForNextArrival() {
+        return systemState.getClock() >= systemState.getNextArrivalTime();
+    }
+
+    @Override
+    public void processEvent(EventInterface event) {
+        if (event instanceof RequestArrivalEvent) {
+            handleRequestArrivalEvent((RequestArrivalEvent) event);
+        }
+
+        if (event instanceof RequestCompleteEvent) {
+            handleRequestCompleteEvent((RequestCompleteEvent) event);
+        }
     }
 
     private void handleRequestArrivalEvent(RequestArrivalEvent event) {
@@ -153,10 +157,6 @@ public class Configuration implements SimulationInterface {
         double meanServiceTime = expDist.random(serviceTime);
         double departureTime = systemState.getClock() + meanServiceTime;
         eventList.add(new RequestCompleteEvent(arrivingEvent.getTime(), departureTime, server));
-    }
-
-    private boolean isTimeForNextArrival() {
-        return systemState.getClock() >= systemState.getNextArrivalTime();
     }
 
     private void updateStatistics() {

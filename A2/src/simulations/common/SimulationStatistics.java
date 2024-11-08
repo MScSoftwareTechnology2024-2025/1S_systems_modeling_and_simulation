@@ -23,12 +23,16 @@ public class SimulationStatistics {
         return responseTimes.isEmpty() ? 0 : sum / responseTimes.size();
     }
 
-    public double calculateAverageRequestsInSystem() {
-        double sum = 0.0;
-        for (double requests : requestsInSystem) {
-            sum += requests;
-        }
-        return requestsInSystem.isEmpty() ? 0 : sum / requestsInSystem.size();
+    public double getDropRate() {
+        double dropRate = (double) requestCount[REQUEST_DROPPED] / requestCount[REQUEST_ARRIVED];
+        double dropRatePercentage = dropRate * TO_PERCENTAGE;
+        return dropRatePercentage;
+    }
+
+    public double getUtilization() {
+        double utilization = timeUnderLoad / totalTime;
+        double utilizationPercentage = utilization * TO_PERCENTAGE;
+        return utilizationPercentage;
     }
 
     public void addRequestsInSystem(double requests) {
@@ -55,18 +59,6 @@ public class SimulationStatistics {
         return requestCount[index];
     }
 
-    public double getDropRate() {
-        double dropRate = (double) requestCount[REQUEST_DROPPED] / requestCount[REQUEST_ARRIVED];
-        double dropRatePercentage = dropRate * TO_PERCENTAGE;
-        return dropRatePercentage;
-    }
-
-    public double getUtilization() {
-        double utilization = timeUnderLoad / totalTime;
-        double utilizationPercentage = utilization * TO_PERCENTAGE;
-        return utilizationPercentage;
-    }
-
     public void printStatistics() {
         System.out.println("\n______Simulation statistics______");
         System.out.println("Request arrived: " + requestCount[REQUEST_ARRIVED]);
@@ -76,7 +68,5 @@ public class SimulationStatistics {
         System.out.println("Utilization: " + String.format("%.2f", this.getUtilization()) + "%");
         System.out.println(
                 "Average response time: " + String.format("%.2f", this.calculateAverageResponseTime()) + " seconds");
-        System.out.println(
-                "Average requests in system: " + String.format("%.2f", this.calculateAverageRequestsInSystem()));
     }
 }
